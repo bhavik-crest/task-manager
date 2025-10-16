@@ -1,8 +1,6 @@
-const API_URL = "http://127.0.0.1:8000";
-
 export const fetchTasks = async () => {
     try {
-        const res = await fetch(`${API_URL}/tasks`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_process.env.NEXT_PUBLIC_API_URL}/tasks`);
         if (!res.ok) throw new Error(`Fetch error: ${res.statusText}`);
         return await res.json();
     } catch (error) {
@@ -13,7 +11,7 @@ export const fetchTasks = async () => {
 
 export const fetchTaskById = async (id) => {
     try {
-        const res = await fetch(`${API_URL}/tasks/${id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`);
         if (!res.ok) throw new Error(`Fetch error: ${res.statusText}`);
         return await res.json();
     } catch (error) {
@@ -24,7 +22,7 @@ export const fetchTaskById = async (id) => {
 
 export const createTask = async (task) => {
     try {
-        const res = await fetch(`${API_URL}/tasks`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(task),
@@ -39,7 +37,7 @@ export const createTask = async (task) => {
 
 export const updateTask = async (id, task) => {
     try {
-        const res = await fetch(`${API_URL}/tasks/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(task),
@@ -53,7 +51,7 @@ export const updateTask = async (id, task) => {
 };
 
 export const deleteTask = async (id) => {
-    const res = await fetch(`${API_URL}/tasks/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
         method: 'DELETE',
     });
     if (!res.ok) {
