@@ -1,6 +1,6 @@
 export const fetchTasks = async () => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_process.env.NEXT_PUBLIC_API_URL}/tasks`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks`);
         if (!res.ok) throw new Error(`Fetch error: ${res.statusText}`);
         return await res.json();
     } catch (error) {
