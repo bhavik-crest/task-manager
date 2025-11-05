@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchTasks, deleteTask } from "./api/tasks";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
+import Swal from 'sweetalert2';
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
@@ -29,18 +30,42 @@ export default function Tasks() {
   };
 
   const handleDelete = async (taskId) => {
-    if (!confirm("Are you sure you want to delete this task?")) return;
-
     try {
-      await deleteTask(taskId);
-      loadTasks();
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (result.isConfirmed) {
+        await deleteTask(taskId);
+        await loadTasks();
+        
+        Swal.fire(
+          'Deleted!',
+          'Task has been deleted.',
+          'success'
+        );
+      }
     } catch (error) {
-      alert("Failed to delete task");
+      Swal.fire(
+        'Error!',
+        'Failed to delete task.',
+        'error'
+      );
       console.error(error);
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading tasks...</p>;
+  if (loading) return (
+    <div className="flex justify-center items-center min-h-[200px]">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-5 border-b-5 border-blue-500"></div>
+    </div>
+  );
 
   return (
     <div className="max-w-4xl mx-auto mt-12 p-6">
