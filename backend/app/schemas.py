@@ -1,47 +1,33 @@
-from pydantic import BaseModel, validator, root_validator
-from typing import Optional, Literal
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Optional
+from enum import Enum
+
+class StatusEnum(str, Enum):
+    pending = "pending"
+    done = "done"
 
 class TaskBase(BaseModel):
-    title: str
-    description: Optional[str] = ""
-    status: Literal["pending", "done"] = "pending"
+    title: str = Field(..., min_length=1)
+    description: Optional[str] = None
+    status: StatusEnum = StatusEnum.pending
 
-    @validator('title')
-    def title_length(cls, v):
-        if not (1 <= len(v) <= 100):
-            raise ValueError('Title must be between 1 and 100 characters')
-        return v
-
-    @validator('description')
-    def description_length(cls, v):
-        if v and len(v) > 300:
-            raise ValueError('Description must be at most 300 characters')
-        return v
+    model_config = ConfigDict(from_attributes=True)
 
 class TaskCreate(TaskBase):
-    pass
+    title: str
+    description: Optional[str] = None
+    status: StatusEnum = StatusEnum.pending
+
+    model_config = ConfigDict(from_attributes=True)
 
 class TaskUpdate(BaseModel):
-    title: Optional[str]
-    description: Optional[str]
-    status: Optional[Literal["pending", "done"]]
+    title: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[StatusEnum] = None
 
-    @validator('title')
-    def title_length(cls, v):
-        if v is not None:
-            if len(v.strip()) == 0 or not (1 <= len(v) <= 100):
-                raise ValueError('Title must be between 1 and 100 characters and not empty')
-        return v
+    model_config = ConfigDict(from_attributes=True)
 
-    @validator('description')
-    def description_length(cls, v):
-        if v is not None and len(v) > 300:
-            raise ValueError('Description must be at most 300 characters')
-        return v
-
-
-class TaskOut(TaskBase):
+class Task(TaskBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

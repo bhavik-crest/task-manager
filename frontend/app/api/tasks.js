@@ -1,4 +1,4 @@
-const API_URL = "https://backend-chi-sable-92.vercel.app";
+const API_URL = "http://127.0.0.1:8000";
 
 export const fetchTasks = async () => {
     try {
@@ -40,7 +40,7 @@ export const createTask = async (task) => {
 export const updateTask = async (id, task) => {
     try {
         const res = await fetch(`${API_URL}/tasks/${id}`, {
-            method: "PUT",
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(task),
         });

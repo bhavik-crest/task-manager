@@ -1,67 +1,36 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from . import models, schemas
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.models import Task
+from app.schemas import TaskCreate, TaskUpdate
 
+async def get_tasks(db: AsyncSession):
+    result = await db.execute(select(Task))
+    return result.scalars().all()
 
-def get_tasks(db: Session):
-    try:
-        return db.query(models.Task).all()
-    except SQLAlchemyError as e:
-        print(f"[ERROR] Failed to fetch tasks: {e}")
-        return []
+async def get_task(db: AsyncSession, task_id: int):
+    return await db.get(Task, task_id)
 
+async def create_task(db: AsyncSession, task: TaskCreate):
+    db_task = Task(**task.dict())
+    db.add(db_task)
+    await db.commit()
+    await db.refresh(db_task)
+    return db_task
 
-def get_task(db: Session, task_id: int):
-    try:
-        return db.query(models.Task).filter(models.Task.id == task_id).first()
-    except SQLAlchemyError as e:
-        print(f"[ERROR] Failed to fetch task with id {task_id}: {e}")
+async def update_task(db: AsyncSession, task_id: int, task_update: TaskUpdate):
+    db_task = await get_task(db, task_id)
+    if not db_task:
         return None
+    for key, value in task_update.dict(exclude_unset=True).items():
+        setattr(db_task, key, value)
+    await db.commit()
+    await db.refresh(db_task)
+    return db_task
 
-
-def create_task(db: Session, task: schemas.TaskCreate):
-    try:
-        db_task = models.Task(**task.dict())
-        db.add(db_task)
-        db.commit()
-        db.refresh(db_task)
-        return db_task
-    except SQLAlchemyError as e:
-        db.rollback()
-        print(f"[ERROR] Failed to create task: {e}")
+async def delete_task(db: AsyncSession, task_id: int):
+    db_task = await get_task(db, task_id)
+    if not db_task:
         return None
-
-
-def update_task(db: Session, task_id: int, task: schemas.TaskUpdate):
-    try:
-        db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
-        if db_task is None:
-            print(f"[INFO] Task with id {task_id} not found for update.")
-            return None
-
-        for key, value in task.dict(exclude_unset=True).items():
-            setattr(db_task, key, value)
-
-        db.commit()
-        db.refresh(db_task)
-        return db_task
-    except SQLAlchemyError as e:
-        db.rollback()
-        print(f"[ERROR] Failed to update task with id {task_id}: {e}")
-        return None
-
-
-def delete_task(db: Session, task_id: int):
-    try:
-        db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
-        if db_task is None:
-            print(f"[INFO] Task with id {task_id} not found for deletion.")
-            return None
-
-        db.delete(db_task)
-        db.commit()
-        return db_task
-    except SQLAlchemyError as e:
-        db.rollback()
-        print(f"[ERROR] Failed to delete task with id {task_id}: {e}")
-        return None
+    await db.delete(db_task)
+    await db.commit()
+    return db_task
