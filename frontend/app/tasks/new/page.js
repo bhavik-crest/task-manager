@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createTask } from "../../api/tasks";
 
-const API_URL = "http://127.0.0.1:8000";
-
 export default function AddTaskPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,6 +42,7 @@ export default function AddTaskPage() {
       await createTask(formData);
       router.push("/");
     } catch (error) {
+      setIsSubmitting(false);
       if (error.details?.errors) {
         // API validation errors
         const apiErrors = {};

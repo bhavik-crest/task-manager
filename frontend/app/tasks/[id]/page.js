@@ -5,8 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { fetchTaskById, updateTask } from "../../api/tasks";
 
 
-const API_URL = "http://127.0.0.1:8000";
-
 export default function EditTaskPage() {
     const router = useRouter();
     const { id } = useParams();
@@ -59,28 +57,39 @@ export default function EditTaskPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setApiError('');
+        setApiError("");
+        setErrors({});
 
         if (!validate()) return;
 
         setIsSubmitting(true);
         try {
+            formData.status = ""
             await updateTask(id, formData);
-            router.push('/');
+            router.push("/");
         } catch (error) {
-            if (error.details?.errors) {
+            setIsSubmitting(false);
+            // Backend validation error handling
+            if (error.details && Array.isArray(error.details)) {
                 const fieldErrors = {};
-                error.details.errors.forEach(({ field, message }) => {
-                    fieldErrors[field] = message;
+                error.details.forEach((detailMsg) => {
+                    // detailMsg example: "Error in title: Input should be a valid string"
+                    const match = detailMsg.match(/Error in (\w+): (.+)/);
+                    if (match) {
+                        const field = match[1];
+                        const message = match[2];
+                        fieldErrors[field] = message;
+                    }
                 });
                 setErrors(fieldErrors);
             } else {
-                setApiError(error.message || 'Unknown error');
+                setApiError(error.message || "Unknown error");
             }
         } finally {
             setIsSubmitting(false);
         }
     };
+
 
     if (loading) return <p className="text-center mt-10 text-gray-600">Loading task data...</p>;
 
