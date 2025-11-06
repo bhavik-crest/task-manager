@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request
 from app.routers import tasks
 from app.models import Base
 from app.database import engine
-import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -17,7 +16,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,       # or ["*"] to allow all origins (not recommended in production)
+    allow_origins=["*"],       # or ["*"] to allow all origins (not recommended in production)
     allow_credentials=True,
     allow_methods=["*"],         # allows all methods GET, POST, PUT, DELETE, etc.
     allow_headers=["*"],         # allow all headers like authorization, content-type, etc.
