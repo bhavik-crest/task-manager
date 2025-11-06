@@ -22,10 +22,10 @@ app.add_middleware(
     allow_headers=["*"],         # allow all headers like authorization, content-type, etc.
 )
 
-@app.on_event("startup")
-async def startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+# @app.on_event("startup")
+# async def startup():
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
