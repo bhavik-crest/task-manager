@@ -6,6 +6,10 @@ from app.database import get_db
 
 router = APIRouter()
 
+@app.get("/health")
+async def health():
+    return {"status": "okkkkk"}
+    
 @router.get("/tasks", response_model=list[Task])
 async def read_tasks(db: AsyncSession = Depends(get_db)):
     try:
