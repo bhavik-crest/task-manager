@@ -50,12 +50,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 # Global exception handler for unexpected errors
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Unhandled error: {exc}", exc_info=True)
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal Server Error"},
-    )
+# @app.exception_handler(Exception)
+# async def global_exception_handler(request: Request, exc: Exception):
+#     logger.error(f"Unhandled error: {exc}", exc_info=True)
+#     return JSONResponse(
+#         status_code=500,
+#         content={"detail": "Internal Server Error"},
+#     )
 
 app.include_router(tasks.router)
