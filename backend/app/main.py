@@ -27,10 +27,10 @@ app.add_middleware(
 )
 
 # Startup event for DB table creation
-@app.on_event("startup")
-async def startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+# @app.on_event("startup")
+# async def startup():
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
 
 # Validation error handler to return friendly error messages
 @app.exception_handler(RequestValidationError)
