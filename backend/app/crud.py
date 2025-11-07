@@ -5,7 +5,7 @@ from app.schemas import TaskCreate, TaskUpdate
 from app.database import supabase
 
 async def get_tasks():
-    response = supabase.table("tasks").select("*").execute()
+    response = supabase.table("tasks").select("*").order("id", desc=True).execute()
     return response.data
 
 async def get_task(task_id: int):
