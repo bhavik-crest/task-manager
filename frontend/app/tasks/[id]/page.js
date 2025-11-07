@@ -91,7 +91,11 @@ export default function EditTaskPage() {
     };
 
 
-    if (loading) return <p className="text-center mt-10 text-gray-600">Loading task data...</p>;
+    if (loading) return (
+        <div className="flex justify-center items-center min-h-[200px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-5 border-b-5 border-blue-500"></div>
+        </div>
+    );
 
     return (
         <div className="max-w-lg mx-auto p-8 bg-white rounded-lg shadow-lg mt-12">
