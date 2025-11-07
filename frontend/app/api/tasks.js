@@ -53,6 +53,7 @@ export const createTask = async (task) => {
 
 export const updateTask = async (id, task) => {
   try {
+    console.log("Updating task with ID:", id, "Data:", task);
     const res = await fetch(`${API_URL}/tasks/${id}`, {
       method: "POST", // use PUT for update to follow REST conventions
       headers: { "Content-Type": "application/json" },

@@ -64,7 +64,7 @@ export default function EditTaskPage() {
 
         setIsSubmitting(true);
         try {
-            formData.status = ""
+            //formData.status = ""
             await updateTask(id, formData);
             router.push("/");
         } catch (error) {

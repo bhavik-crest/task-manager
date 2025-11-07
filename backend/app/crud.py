@@ -2,35 +2,31 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Task
 from app.schemas import TaskCreate, TaskUpdate
+from app.database import supabase
 
-async def get_tasks(db: AsyncSession):
-    result = await db.execute(select(Task))
-    return result.scalars().all()
+async def get_tasks():
+    response = supabase.table("tasks").select("*").execute()
+    return response.data
 
-async def get_task(db: AsyncSession, task_id: int):
-    return await db.get(Task, task_id)
+async def get_task(task_id: int):
+    response = supabase.table("tasks").select("*").eq("id", task_id).execute()
+    tasks = response.data
+    return tasks[0] if tasks else None
 
-async def create_task(db: AsyncSession, task: TaskCreate):
-    db_task = Task(**task.dict())
-    db.add(db_task)
-    await db.commit()
-    await db.refresh(db_task)
-    return db_task
+async def create_task(task: TaskCreate):
+    response = supabase.table("tasks").insert(task.dict()).execute()
+    created_tasks = response.data
+    return created_tasks[0] if created_tasks else None
 
-async def update_task(db: AsyncSession, task_id: int, task_update: TaskUpdate):
-    db_task = await get_task(db, task_id)
-    if not db_task:
+async def update_task(task_id: int, task_update: TaskUpdate):
+    update_data = {k: v for k, v in task_update.dict(exclude_unset=True).items()}
+    if not update_data:
         return None
-    for key, value in task_update.dict(exclude_unset=True).items():
-        setattr(db_task, key, value)
-    await db.commit()
-    await db.refresh(db_task)
-    return db_task
+    response = supabase.table("tasks").update(update_data).eq("id", task_id).execute()
+    updated_tasks = response.data
+    return updated_tasks[0] if updated_tasks else None
 
-async def delete_task(db: AsyncSession, task_id: int):
-    db_task = await get_task(db, task_id)
-    if not db_task:
-        return None
-    await db.delete(db_task)
-    await db.commit()
-    return db_task
+async def delete_task(task_id: int):
+    response = supabase.table("tasks").delete().eq("id", task_id).execute()
+    deleted_tasks = response.data
+    return deleted_tasks[0] if deleted_tasks else None
